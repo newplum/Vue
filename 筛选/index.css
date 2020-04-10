@@ -1,0 +1,60 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    list-style: none;
+}
+
+.wrapper {
+    width: 800px;
+    margin: 50px auto;
+    border: 1px solid #eeeeee;
+}
+
+.wrapper div {
+    height: 40px;
+    border: 1px solid #eeeeee;
+    padding: 10px;
+    margin: 5px;
+    line-height: 40px;
+    color: blue;
+}
+
+.wrapper div .kind {
+    color: black;
+}
+
+
+.wrapper div .selected {
+    background-color: chocolate;
+    color: white;
+}
+
+.wrapper div span {
+    font-size: 14px;
+    display: inline-block;
+    margin-left: 20px;
+    padding: 0 10px;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 10px;
+}
+
+.wrapper div ul {
+    display: inline-block;
+    font-size: 14px;
+}
+
+.wrapper div ul li{
+    display: inline-block;
+    margin-left: 20px;
+    padding: 0 10px;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 10px;
+    cursor: pointer;
+    /*border: 1px solid #000000;*/
+}
+
+.wrapper div .noChoose{
+    color: grey;
+}
