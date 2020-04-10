@@ -1,119 +1,39 @@
-- 在内联语句中使用事件对象时，可以利用$event来获取事件源对象 
-```
-<div id="app">
-    <button v-on:click="handle(1, $event)"></button>
-</div>
-new Vue({
-    el: '#app',
-    methods: {
-    handle: function (num, e) {
-        num += 1;
-        console.log(e.target)
-    }
-}
-})
-```
-- 绑定动态事件
-```
-<div id="app">
-    <button v-on:[event]="handle"></button>
-</div>
-new Vue({
-    el: '#app',
-    data: {
-        event: 'click'
-    },
-    methods: {
-    handle: function () {
-       ...
-    }
-}
-})
-```
-- ###事件修饰符
-#### .stop
-######相当于调用 event.stop，阻止冒泡事件
+## 在V-for中使用数组
 ```html
-<div class="id">
-    <div @class="alert('div')">
-        <button @click.stop="alert('button')"></button>
-</div>
-</div>
+<ul>
+    <li v-for="(item, index) in list"></li>
+</ul>
 ```
-```javascript
-new Vue({
-    el: '#app',
-    methods: {
-        alert(param) {
-            alert(param);
-        }      
-    }
-})
-```
-#### .prevent
-######相当于调用 event.preventDefault()，阻止默认事件
+可以利用of替代in作为分隔符，因为它更接近迭代器的语法
 ```html
-<div id="app">
-  <form @submit.prevent="onSubmit">
-    <input type="submit">
-  </form>
+<div v-for="item of items"></div>
 ```
-#### .capture
-######事件捕获
+## 在V-for中使用对象
 ```html
-<!-- 此时先弹出div再弹出button -->
-<div id="app">
-  <div @click.capture="alert('div')">
-    <button @click="alert('button')">点击</button>
-  </div>
-</div>
+<ul>
+    <li v-for="(value, key, index) in obj"></li>
+</ul>
 ```
-#### .self
-######只当事件是从侦听器绑定的元素本身触发时才触发回调
-#### .once
-######只触发一次回调
-#### .passive
-######告诉浏览器不阻止默认事件
-###注意：使用修饰符的顺序不同有不同的效果
-````
-v-on:click.prevent.self 会阻止所有的点击的默认事件
-v-on:click.self.prevent 只会阻止对元素自身点击的默认事件
-````
-- ###按键修饰符
+## 可以利用 template 循环一段包含多个元素的内容
 ```html
-<input type="text" @keyup.enter="submit">
+<template v-for="item in items">
+    <li>{{ item.msg }}</li>
+    <span>{{ item.img }}</span>
+</template>
 ```
-- #####自定义按键名
-```javascript
-// 全局配置
-// 使用 @keyup.ent
-Vue.config.keyCodes.ent = 13; 
-```
-```javascript
-Vue.config.keyCodes = {  
-    ent: 13,
-    a: 96
-}
-```
-- ###系统修饰键（组合键）
-```javascript
-@keyup.ctrl.enter='handle'
-```
-- ###exact 修饰符
+## 不要把 v-for 和 v-if 同时放在同一个元素上
 ```html
-<!-- 即使 Alt 或 Shift 被一同按下时也会触发 -->
-<button @click.ctrl="onClick">A</button>
-
-<!-- 有且只有 Ctrl 被按下的时候才触发 -->
-<button @click.ctrl.exact="onCtrlClick">A</button>
-
-<!-- 没有任何系统修饰符被按下的时候才触发 -->
-<button @click.exact="onClick">A</button>
+<div v-for="item in oldData" v-if="item.flag"></div>
 ```
-- ###鼠标按钮修饰符
-#####仅当点击特定的鼠标按钮时会处理执行函数
+v-for 的优先级比 v-if 的优先级要高。哪怕只渲染出一小部分活跃用户的元素，在每次重新渲染的时候也会遍历整个列表，不论活跃用户是否发生了变化。
 ```javascript
-.left
-.right
-.middle
+// 解决办法是在JS中将要遍历的数据按照需求过滤一遍，不在元素中判断
+vm.newData = vm.oldData.filter(data => data.flag)
 ```
+```html
+<div v-for="item in newData"></div>
+```
+## key
+### key值类型:number|string
+### key值必须唯一
+Vue更新使用v-for渲染的元素列表时，它默认使用“就地更新”的策略。如果数据项的顺序被改变，Vue 将不会移动 DOM 元素来匹配数据项的顺序，而是简单复用此处每个元素.但是在更多的时候，我们并不需要这样去处理，所以，为了给Vue一个提示，以便它能跟踪每个节点的身份，从而重用和重新排序现有元素，我们需要为每项提供一个唯一key特性，Vue会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
