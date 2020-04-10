@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TODO</title>
+    <link rel="stylesheet" href="./index.css">
+    <script src="https://cdn.bootcss.com/vue/2.6.11/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="header" >
+            <div class="title">
+                <span>TODO</span>
+            </div>
+            <div class="add">
+                <input type="text" class="write" id="inp">
+                <button class="submit" @click="insert">添加</button>
+            </div>
+        </div>
+        <div class="content">
+        <div class="doing" v-for="item of list">
+            <span>{{ item.title }}</span>
+            <span class="number" v-if="item.taskNum">{{ item.taskNum }}</span>
+            <ul>
+                <li v-for="(task, taskIndex) of item.task" :class="{done: item.type == 1}">
+                    <span class="square" @click="change(task, taskIndex, item)"></span>
+                    <span>{{ task }}</span>
+                    <button @click="deleteTask(task, taskIndex, item)">删除</button>
+                </li>
+            </ul>
+        </div>
+<!--        <div class="done">-->
+<!--            <span>已经完成</span>-->
+<!--            <span class="number">1</span>-->
+<!--            <ul>-->
+<!--                <li><span class="square"></span><span>睡觉</span><button>删除</button></li>-->
+<!--            </ul>-->
+<!--        </div>-->
+            </div>
+    </div>
+<script src="index.js"></script>
+</body>
+</html>

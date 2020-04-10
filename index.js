@@ -1,76 +1,53 @@
-const data = {
-    name: 'tom',
-    sex: 'male',
-    arr: [1, 2, 3, 4, 5],
-    son: {
-        name: 'bod',
-        age: 5
-    }
-}
-
-// 数据劫持不会监听数组，但为了在数组类型的数据改变时能渲染页面，需要改变以前数组的方法
-// 创建一个新的数组原型是为了不污染原来的数组原型
-const newArrayMethods= Object.create(Array.prototype);
-['push', 'pop', 'shift', 'unshift', 'splice', 'reverse', 'sort'].forEach( (ele) => {
-    // 改变原数组的方法
-    newArrayMethods[ele] = function () {
-        Array.prototype[ele].call(this, ...arguments);
-        render();
+const vm = new Vue({
+    el: '#app',
+    data: {
+        list: [
+            {
+                type: 0,
+                title: '正在进行',
+                task: ['吃饭', '睡觉'],
+                taskNum: null
+            },
+            {
+                type: 1,
+                title: '已经完成',
+                task: ['玩耍', '喝水'],
+                taskNum: null
+            }
+        ]
+    },
+    methods: {
+        insert: function () {
+            var oInp = document.getElementById('inp');
+            this.list[0].task.push(oInp.value);
+            this.list[0].taskNum += 1;
+            oInp.value = '';
+        },
+        change: function (task, taskIndex, item) {
+            if (item.type == 0) {
+                this.list[0].task.splice(taskIndex, 1);
+                this.list[1].task.push(task);
+                this.list[0].taskNum -= 1;
+                this.list[1].taskNum += 1;
+            }else {
+                this.list[1].task.splice(taskIndex, 1);
+                this.list[0].task.push(task);
+                this.list[1].taskNum -= 1;
+                this.list[0].taskNum += 1;
+            }
+        },
+        deleteTask: function (task, taskIndex, item) {
+            if (item.type == 0) {
+                this.list[0].task.splice(taskIndex, 1);
+                this.list[0].taskNum -= 1;
+            }else {
+                this.list[1].task.splice(taskIndex, 1);
+                this.list[1].taskNum -= 1;
+            }
+        }
+    },
+    created () {
+        this.list[0].taskNum = this.list[0].task.length;
+        this.list[1].taskNum = this.list[1].task.length;
     }
 })
-
-function render () {
-    console.log('渲染页面');
-}
-
-function defineProperty (obj, key, value) {
-    // 递归的方式判断value是否是对象，只有对象才能进行数据劫持
-    observe(value);
-    Object.defineProperty(obj, key, {
-        get() {
-            return value;
-        },
-        set(v) {
-            // 如果新赋的值和原来的值一样，不渲染页面
-            if (value === v) {
-                return;
-            }
-            value = v;
-            render();
-        }
-    })
-}
-function observe (obj) {
-    if (Array.isArray(obj)) {
-        obj.__proto__ = newArrayMethods;
-        return;
-    }
-    if (typeof obj == 'object') {
-        for (var key in obj) {
-            defineProperty(obj, key, obj[key]);
-        }
-    }
-}
-
-function $set (obj, key, value) {
-    if (Array.isArray(obj)) {
-        obj.splice(key, 1, value);
-        return value;
-    }
-    defineProperty(obj, key, value);
-    render();
-    return value;
-}
-
-function $delete(obj, key) {
-    if (Array.isArray(obj)) {
-        obj.splice(key, 1);
-        return;
-    }
-    delete obj[key];
-    render();
-}
-
-observe(data);
-
-
