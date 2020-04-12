@@ -1,131 +1,46 @@
-# v-model
-在表单元素上创建双向数据绑定，本质上是语法糖
-## input
-### type=text 语法糖:@input + :value
+# 计算属性
 ```html
-// @input 监听数据输入数据， :value实现数据驱动视图
-<input type="text" @input="msg=$event.target.value" :value="msg">
-```
-```html
-// v-model
-<input type="text" v-model="msg">
+<div id="app">
+    <span>{{ add }}</span>
+</div>
 ```
 ```javascript
 new Vue({
-    ...,
+    el: '#app',
     data: {
-        msg: ''
-    }
-})
-```
-### type=checkbox 复选框 语法糖:@change + :checked
-#### 单个复选框
-```html
-// 绑定的数据是布尔值
-<input type="checkbox" v-model="checked">
-```
-```javascript
-new Vue({
-    ...,
-    data: {
-        checked: ''
-    }
-})
-```
-#### 多个复选框
-```html
-// 绑定的数据是数组
-// 每选择一个复选框，就会向 checkList 数组里 push 该复选框的 value
-<input type="checkbox" value="one" v-model="checkList">
-<input type="checkbox" value="two" v-model="checkList">
-<input type="checkbox" value="three" v-model="checkList">
-```
-```javascript
-new Vue({
-    ...,
-    data: {
-        checkList: []
-    }
-})
-```
-### type=radio 单选框 语法糖: @change + :checked
-```html
-// 绑定的数据是字符串
-// 将选择的单选框的 value 赋值给 picked
-<input type="radio" value="one" v-model="picked">
-<input type="radio" value="two" v-model="picked">
-<input type="radio" value="three" v-model="picked">
-```
-```javascript
-new Vue({
-    ...,
-    data: {
-        picked: ''
-    }
-})
-```
-## textarea 语法糖: @input + :value
-```html
-<textarea v-model="text"></textarea>
-```
-```javascript
-new Vue({
-    ...,
-    data: {
-        text: ''
-    }
-})
-```
-## select 下拉列表 语法糖: @change + :value
-### 单选
-```html
-// 绑定的是 option 中的值
-<select v-model="select">
-    <option disabled>请选择</option>
-    <option>A</option>
-    <option>B</option>
-    <option>C</option>
-</select>
-```
-```javascript
-new Vue({
-    ...,
-    data: {
-        select: '请选择'
-    }
-})
-```
-### 多选
-```html
-// 原理同 checkbox 的复选框
-<select v-model="selectList" multiple>
-    <option>A</option>
-    <option>B</option>
-    <option>C</option>
-</select>
-```
-```javascript
-new Vue({
-    ...,
-    data: {
-        selectList: []
+        num: 1
+    },
+    computed: {
+        add: function () {
+            // 返回的值就是计算属性最终的值
+            return this.num ++;
+        }
     }
 })
 ```
 
-## 修饰符
-### .lazy
-将 input 事件变为 change 事件
-```html
-<input type="text" v-model.lazy="msg">
+## 计算属性与方法的区别
+计算属性是基于响应式依赖进行缓存的，计算属性的值一直存于缓存中，只要它依赖的data数据不改变，每次访问计算属性，都会立刻返回缓存的结果，而不是再次执行函数。而方法则是每次触发重新渲染，调用方法将总会再次执行函数。
+
+## 计算属性的另一种写法
+```javascript
+new Vue({
+    el: '#app',
+    data: {
+        num1: 1,
+        num2: 2
+    },
+    computed: {
+        sum: {
+            get () {
+              return this.num1
+            },
+            set (v) {
+              console.log('setter', v);
+            }     
+        }   
+    }
+})
 ```
-### .number
-自动将用户的输入值转为数值类型
-```html
-<input type="number" v-model.number="age">
-```
-### .trim
-自动过滤用户输入的首尾空白字符
-```html
-<input type="text" v-model.trim="msg">
-```
+- get 函数是在获取计算属性的值的时候执行的
+- set 函数是在对计算属性进行设置的时候执行的
