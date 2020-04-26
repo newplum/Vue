@@ -1,138 +1,126 @@
-# 插槽
-和 HTML 元素一样，我们经常需要向一个组件传递内容，像这样：
-```html
-<my-cmp>
-  Something bad happened.
-</my-cmp>
-```
-但是页面上是不会显示用这种方式传递的内容的，可以使用插槽解决
-```html
-<my-cmp>
-  Something bad happened.
-</my-cmp>
-```
-```js
-Vue.compopnent('my-cmp', {
-  template: `
-    <button>
-      <slot></slot>
-    </button>
-  `
-})
-```
-当组件渲染时，<slot></slot>将会被替换为“Something bad happened.”。 插槽内可以包含任何模板代码，包括HTML和其他组件。 如果<my-cmp>没有包含<slot>元素，则该组件起始标签和结束标签之间的任何内容都会被抛弃。
+# 组件间通信
+1. ## prop
+父组件传递数据给子组件时，可以通过特性传递。
 
-## 编译作用域
-父级模板里的所有内容都是在父级作用域中编译的；子模板里的所有内容都是在子作用域中编译的。
+推荐使用这种方式进行父->子通信。
 
-## 后备内容
-如果给插槽设置了默认的内容，那么当组件中没有使用插槽的时候，默认插槽生效；如：
-```html
-<my-cmp></my-cmp>
-```
-```js
-Vue.compopnent('my-cmp', {
-  template: `
-    <button>
-      <slot>hello, world</slot>
-    </button>
-  `
-})
-//页面上出现 hello, world
-```
-反之，组件中使用了插槽；组件中的插槽内容会替换模板中的插槽内容；如：
-```html
-<my-cmp>some words</my-cmp>
-```
-```js
-Vue.compopnent('my-cmp', {
-  template: `
-    <button>
-      <slot>hello, world</slot>
-    </button>
-  `
-})
-//页面上出现 some words
-```
-## 具名插槽
-给<slot>用上特殊属性 name; 如：
-```js
-<slot name="header"></slot>
-<slot></slot>
-<slot name="footer"></slot>
-```
-在组件中使用的时候：
-```html
-<div id='app'>
-  <template v-slot:header> // 指定这个插槽用于模板中的位置：插槽 name = header 的位置
-    <div> header </div>
-  </template>
-  <template v-slot:default>
-    <div> main </div>
-  </template>
-  <template v-slot:footer>
-    <div> footer </div>
-  </template>
-</div>
-```
-### 具名插槽缩写
-v-slot => #
-```html
-<my-cmp>
-  <template #header>
-    <h1>头部</h1>
-  </template>
+2. ## $emit
+子组件传递数据给父组件时，触发事件，从而抛出数据。
 
-  <template #default>
-    <p>内容</p>
-    <p>内容</p>
-  </template>
+推荐使用这种方式进行子->父通信。
 
-  <template #footer>
-    <p>底部</p>
-  </template>
-</my-cmp>
+3. ## $attrs
+当父组件的传递的特性未被注册时，在子组件中使用 $attrs 就可以获取到该特性。  
+
+祖先组件传递数据给子孙组件时，可以利用$attrs传递。
+
+demo或小型项目可以使用$attrs进行数据传递，中大型项目不推荐，数据流会变的难于理解。
+
+$attrs的真正目的是撰写基础组件，将非Prop特性赋予某些DOM元素。
+
+4. ## $listeners
+$listeners 存放的是所有子组件监听的事件的方法，通过传递参数实现数据传递  
+
+可以在子孙组件中执行祖先组件的函数，从而实现数据传递。
+
+demo或小型项目可以使用$listeners进行数据传递，中大型项目不推荐，数据流会变的难于理解。
+
+$listeners的真正目的是将所有的事件监听器指向这个组件的某个特定的子元素。
+
+5. ## $root
+可以在子组件中访问根实例的数据。
+
+对于 demo 或非常小型的有少量组件的应用来说这是很方便的。中大型项目不适用。会使应用难于调试和理解。
+
+6. ## $parent 
+可以在子组件中访问父实例的数据。
+
+对于 demo 或非常小型的有少量组件的应用来说这是很方便的。中大型项目不适用。会使应用难于调试和理解。
+
+7. ## $children
+可以在父组件中访问子实例的数据。
+
+对于 demo 或非常小型的有少量组件的应用来说这是很方便的。中大型项目不适用。会使应用难于调试和理解。
+
+8. ## $ref
+可以在父组件中访问子实例的数据。  
+
+尽管存在prop和事件，但是有时候仍可能需要在JS里直接访问一个子组件，可以通过 ref 特性为子组件赋予一个ID引用：
+```html
+<my-cmp ref="cmp"></my-cmp>
 ```
+这样就可以通过this.$refs.cmp 来访问<my-cmp>实例。 ref 也可以 对指定DOM元素进行访问，如:
+```html
+<input ref="input" />
+```
+可以通过 this.$refs.input 来访问到该DOM元素。
+当ref 和 v-for 一起使用时，得到的引用将会是一个包含了对应数据源的这些子组件的数组。
 
-## 作用域插槽
-为了能够让插槽内容访问子组件的数据，我们可以将子组件的数据作为<slot>元素的一个特性绑定上去
+注意: $refs 只会在组件渲染完成之后生效，并且它们不是响应式的，适用于demo或小型项目。
+
+9. ## provide & inject
+祖先组件提供数据（provide），子孙组件按需注入（inject）。
+### provide
+provide 选项允许我们指定想要提供给后代组件的数据/方法，例如:
 ```js
-Vue.component('my-cmp', {
+Vue.component('cmp-parent', {
+  provide () {
+    return {
+      share: this.share,
+    }
+  },
   data () {
     return {
-      user: {
-        name: 'Tom',
-        age: 18,
-      }
+      share: 'share',
+    }
+  },
+  template: `<div>cmp-parent</div>`
+})
+```
+然后再任何后代组件中，我们都可以使用 inject 选项来接受指定想要添加在实例上的属性。
+### inject
+```js
+Vue.component('cmp-a', {
+  inject: ['share'],
+  template: `<div>cmp-a</div>`
+})
+```
+会将组件的阻止方式，耦合在一起，从而使组件重构困难，难以维护。不推荐在中大型项目中使用，适用于一些小组件的编写。
+
+10. ## eventBus(事件总线)
+在 Vue 原型链上添加一个 $bus 属性，$bus 为一个新的 Vue 实例。那么所有的 Vue 实例上都有 $bus 这个属性，通过 $bus 监听和触发事件（$emit() 和 $on()），用传参的方式传递数据。
+```js
+Vue.prototype.$bus = new Vue();
+```
+```js
+Vue.component('cmp-a', {
+  data () {
+    return {
+      a: 'a'
+    }
+  },
+  methods: {
+    onClick () {
+      this.$bus.$emit('click', this.a)
     }
   },
   template: `
-    <span>
-      <slot v-bind:user="user"></slot>
-    </span>
+    <div>
+      <button @click="onClick">点击</button>
+    </div>
+  `,
+})
+Vue.component('cmp-a', {
+  mounted () {
+    this.$bus.$on('click', data => {
+      console.log(data);
+    })
+  },
+  template: `
+    <div>b</div>
   `,
 })
 ```
-绑定在 <slot> 元素上的特性被称为插槽 prop。 那么在父级作用域中，可以给v-slot 一个值来定义我们提供的插槽prop的名字：
-```html
-<div id="app">
-  <my-cmp>
-    <template v-slot:default="slotProps">
-      {{ slotProps.user.name }}
-    </template>
-  </my-cmp>
-</div>
-```
-### 解构插槽
-我们可以对插槽prop进行解构，如：
-```html
-<my-cmp v-slot="{ user }">
-  {{ user.name }}
-</my-cmp>
-```
-这样模板会更简洁，尤其是在为插槽提供了多个prop时。 此外还可以有其他可能，如prop重命名：
-```html
-<my-cmp v-slot="{ user : person }">
-  {{ person.name }}
-</my-cmp>
-```
+非父子组件通信时，可以使用这种方法，但仅针对于小型项目。中大型项目使用时，会造成代码混乱不易维护。
+
+11. ## Vuex
