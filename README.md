@@ -299,4 +299,4 @@ const router = new VueRouter({
         }
     ]
 })
-```
+```  
