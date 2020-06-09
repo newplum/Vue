@@ -9,7 +9,7 @@
 
 ## 滚动行为
 使用前端路由，当切换到新路由时，想要页面滚动到顶部，或者是保持原先的滚动位置，就像重新加载页面那样，vue-router 可以自定义路由切换时页面如何滚动
-#### 注意：这个功能只在支持 history.pushState 的浏览器中可用。
+###### 注意：这个功能只在支持 history.pushState 的浏览器中可用。
 当创建一个 Router 实例，可以提供一个 scrollBhhavior 方法：
 ```js
 const router = new VueRouter({
