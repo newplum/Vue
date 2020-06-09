@@ -109,3 +109,21 @@ const vm = new Vue({
 10. 调用全局的 afterEach 钩子
 11. 触发 DOM 更新
 12. 用创建好的实例调用 beforeRouteEnter 守卫中传给 next 的回调函数
+
+## VueRouter_路由元信息
+定义路由的时候可以配置 meta 字段，用于自定义一些信息。
+```js
+const router = VueRouter({
+    routes: [
+        {
+            path: '/foo',
+            component: Foo,
+            meta: {
+                a: 1,
+                b: 2
+            }
+        }
+    ]
+})
+```
+在设置了路由元信息之后，可以在组件内访问到：$route.meta
