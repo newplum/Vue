@@ -1,28 +1,52 @@
-# VueRouter_过渡动效-滚动行为
-## 过渡动效
-`<router-view></router-view>`是基本的动态组件，所以可以用`transition`组件给它添加一些过渡效果。
+# 路由原理
+通过 hash、history 的无需刷新页面渲染视图的特性
+## hash模式下
+监听浏览器的 hashchange 方法，获取到对应的路径，通过路径来找到相应的组件进行渲染。
 ```html
-<transition>
-    <router-view></router-view>
-</transition>
-```
+<!-- router-link -->
+<a href="#/">首页</a>
+<a href="#/about">关于</a>
 
-## 滚动行为
-使用前端路由，当切换到新路由时，想要页面滚动到顶部，或者是保持原先的滚动位置，就像重新加载页面那样，vue-router 可以自定义路由切换时页面如何滚动
-#### 注意：这个功能只在支持 history.pushState 的浏览器中可用。
-当创建一个 Router 实例，可以提供一个 scrollBhhavior 方法：
+<!-- router-view -->
+<div id="view"></div>
+```
 ```js
-const router = new VueRouter({
-    routes: [...],
-    scrollBehavior (to, from, savedPosition) {
-        // return 期望滚动到哪个位置
-        return {
-            // 滚动到顶部
-            x: 0,
-            y: 0
-        }
-        // return savedPosition 回退到上个页面的位置
-    }
+// 监听切换路由时 hash 值的改变，并通过改变的 hash 值渲染视图
+window.addEventListener('hashchange', () => {
+    view.innerHTML = location.hash.slice(1);
+})
+// 当 DOM 加载完成后，需要自动渲染的组件
+document.addEventListener('DOMContentLoaded', () => {
+    view.innerHTML = location.hash.slice(1);
 })
 ```
-scrollBehavior 方法接收 to 和 from 路由对象。第三个参数 savedPosition 当且仅当 popstate(通过浏览器的前进、后退按钮触发) 导航时才可用。
+
+## history 模式下
+结合 history.pushState 方法和监听 window 上的 popstate 事件来实现
+```html
+<a onclick="routerChange('/')">首页</a>
+<a onclick="routerChange('/about')">关于</a>
+```
+```js
+// 实现路由的切换，但当使用浏览器的前进、后退功能时，不能重新渲染视图
+function routerChange (path) {
+    history.pushState(null, null, path);
+    view.innerHTML = location.pathname;
+}
+// 监听 popstate 事件，能在使用浏览器的前进、后退功能时重新渲染页面
+window.addEventListener('popstate', () => {
+    view.innerHTML = location.pathname;
+})
+```
+## hash 和 history 区别
+### hash
+1. 通过锚点（#）进行跳转
+2. 浏览器可以前进和后退
+3. 浏览器不刷新
+4. 不会产生请求，不会和服务端进行交流
+
+### history
+1. 没有锚点（#）
+2. 浏览器前进、后退
+3. 浏览器刷新
+4. 会发出请求，和服务端产生交流
