@@ -92,7 +92,7 @@ VueRouter({
 })
 ```
 ## 命名路由-嵌套路由-重定向-别名
-1. 嵌套路由
+### 1. 嵌套路由
 一个被 router-view 渲染的组件想要包含自己的嵌套 router-view 时，可以使用嵌套路由。
 ```js
 // 在 About 组件里嵌套一个 guess 组件
@@ -108,7 +108,7 @@ VueRouter({
     }
 })
 ```
-2. 命名路由
+### 2. 命名路由
 可以通过一个名称标识一个路由，这样在有些路由过长时会方便很多。
 ```js
 VueRouter({
@@ -127,7 +127,7 @@ VueRouter({
 ```html
 <router-link :to={name: 'guess'}>留言</router-link>
 ```
-3. 重定向
+### 3. 重定向
 重定向到一个完整的路径
 ```js
 // 从 /a 重定向到 /b
@@ -168,7 +168,7 @@ VueRouter({
     ]
 })
 ```
-4. 别名
+### 4. 别名
 ```js
 VueRouter({
     routes:[
