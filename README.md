@@ -269,32 +269,46 @@ const router = new VueRouter({
 在组件中使用 $route 会使之与其对应路由形成高度耦合，从而使组件只能在某些特定的 URL上使用，限制了其灵活性。  
 使用 props 将组件和路由解耦。
 ### 布尔模式
-如果在路由配置中 props 被设置为 true，$route.params将会被设置为组件属性
+如果在路由配置中 props 被设置为 true，那么相应组件上会增加一个属性，key 为 $route.params，value 为 $route.params 的值，在组件中通过 props 注册这个属性就能够使用了。
 ```js
 const router = new VueRouter({
     routes:[
         {
-            path:'/about',
+            path:'/about:id',
             component: about,
             props: true
         }
     ]
 })
 ```
-设置时候，在 about 组件中就会有 props 这个属性，通过注册就能使用了
+设置之后，在 about 组件中就会有 id 这个属性，通过注册就能使用了。
+```js
+{
+    props: {
+        id: {
+            type: [String, Number]
+        }
+    },
+    mounted: {
+        console.log(this.id);
+        // 如果不使用这种方法，就只能通过 this.$route.params 获取到 id ，大大限制了灵活性。
+    }
+}
+```
 ### 函数模式
 可以创建一个函数返回 props。函数的第一个参数是 route。
 ```js
 const router = new VueRouter({
     routes:[
         {
-            path:'/about',
+            path:'/about:id',
             component: about,
             porps: route => {
                 // 这个 route 就是 $route
                 return {
-                     
+                     id: route.id
                 }
+                // 这样也能将 id 作为一个返回值，传递给组件作为属性通过注册使用
             }
         }
     ]
